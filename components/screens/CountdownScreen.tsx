@@ -16,7 +16,7 @@ export default function CountdownScreen({
 }) {
   const { settings, contacts, sendAlert, addNotif, showToast } = useStore();
   const total = settings.contagem;
-  const [left, setLeft] = useState(total);
+  const [left, setLeft] = useState<number>(total);
   const [sending, setSending] = useState(false);
   const fired = useRef(false);
 
@@ -30,16 +30,21 @@ export default function CountdownScreen({
     onDone(r);
   };
 
-  useEffect(() => {
-    if (semContatos) return;
-    if (total === 0) {
-      disparar();
-      return;
-    }
-    const t = setInterval(() => setLeft((l) => l - 1), 1000);
-    return () => clearInterval(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+ useEffect(() => {
+  if (semContatos) return;
+
+  if (total === 0) {
+    disparar();
+    return;
+  }
+
+  const t = setInterval(() => {
+    setLeft((l) => Math.max(0, l - 1));
+  }, 1000);
+
+  return () => clearInterval(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   useEffect(() => {
     if (!semContatos && total > 0 && left <= 0) disparar();
